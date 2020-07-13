@@ -7,7 +7,7 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
       engine(dev()),
       random_w(0, static_cast<int>(grid_width)),
       random_h(0, static_cast<int>(grid_height)) {
-  PlaceFood();
+  PlaceFruit();
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
@@ -25,7 +25,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     // Input, Update, Render - the main game loop.
     controller.HandleInput(running, snake);
     Update();
-    renderer.Render(snake, food);
+    renderer.Render(snake, fruit, walls);
 
     frame_end = SDL_GetTicks();
 
@@ -34,8 +34,13 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     frame_count++;
     frame_duration = frame_end - frame_start;
 
-    // After every second, update the window title.
+    // Every second, update the walls
     if (frame_end - title_timestamp >= 1000) {
+
+      // Update the walls
+      UpdateWalls();
+
+      // And the window title
       renderer.UpdateWindowTitle(score, frame_count);
       frame_count = 0;
       title_timestamp = frame_end;
@@ -50,19 +55,67 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   }
 }
 
-void Game::PlaceFood() {
+// Update walls
+
+void Game::UpdateWalls() {
+  // Decay each wall
+  for (auto wall : walls) {
+    wall.update();
+  }
+
+  // Remove any walls with 0 duration left
+  std::remove_if(walls.begin(), walls.end(), [](Wall w){ return w.getDuration(); });
+
+  // If fewer than five walls remain, add a new one
+  if (walls.size() < 5) {
+    PlaceWall();
+  }
+}
+
+// Place a new wall
+void Game::PlaceWall() {
+  int x, y;
+  while (true) {
+    x = random_w(engine);
+    y = random_h(engine);
+    // Check that the location is not occupied by the snake or fruit before placing
+    if (!snake.SnakeCell(x, y) && !(x == fruit.getX() && y == fruit.getY())) {
+
+      // Random duration (5-30 seconds)
+      int duration = rand() % 30 + 5;
+      walls.emplace_back(Wall(x, y, duration));
+      std::cout << "New wall" << std::endl;
+      break;
+    }
+  }
+}
+
+// Place a new random fruit
+void Game::PlaceFruit() {
   int x, y;
   while (true) {
     x = random_w(engine);
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
-    // food.
+    // fruit.
     if (!snake.SnakeCell(x, y)) {
-      food.x = x;
-      food.y = y;
-      return;
+      break;
     }
   }
+
+  // Select and create a fruit
+  switch(rand()%(3)){
+    case 0:
+      fruit = Strawboring(x, y);
+      break;
+    case 1:
+      fruit = Raspboost(x, y);
+      break;
+    case 2:
+      fruit = Aprinot(x, y);
+      break;
+  }
+  std::cout << "New Fruit (" << x << ", " << y << ")" << std::endl;
 }
 
 void Game::Update() {
@@ -73,13 +126,20 @@ void Game::Update() {
   int new_x = static_cast<int>(snake.head_x);
   int new_y = static_cast<int>(snake.head_y);
 
-  // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
-    score++;
-    PlaceFood();
-    // Grow snake and increase speed.
-    snake.GrowBody();
-    snake.speed += 0.02;
+  // Check if there's fruit over here
+  if (fruit.getX() == new_x && fruit.getY() == new_y) {
+    score += fruit.getVal();
+    PlaceFruit();
+
+    // Grow snake
+    if (fruit.getLengthens()){
+      snake.GrowBody();
+    }
+
+    // Increase speed
+    if (fruit.getSpeeds()){
+      snake.speed += 0.02;
+    }
   }
 }
 

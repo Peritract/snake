@@ -38,7 +38,7 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(Snake const snake, SDL_Point const &food) {
+void Renderer::Render(Snake const snake, Fruit const &fruit, std::vector<Wall> const &walls) {
   SDL_Rect block;
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
@@ -47,14 +47,24 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
   SDL_SetRenderDrawColor(sdl_renderer, 0x1E, 0x1E, 0x1E, 0xFF);
   SDL_RenderClear(sdl_renderer);
 
-  // Render food
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xCC, 0x00, 0xFF);
-  block.x = food.x * block.w;
-  block.y = food.y * block.h;
+  // Render fruit
+  std::vector<int> colour = fruit.getColour();
+  SDL_SetRenderDrawColor(sdl_renderer, colour.at(0), colour.at(1),
+                         colour.at(2), 255);
+  block.x = fruit.getX() * block.w;
+  block.y = fruit.getY() * block.h;
   SDL_RenderFillRect(sdl_renderer, &block);
 
+  // Render walls
+  SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, 255);
+  for (auto wall: walls){
+      block.x = wall.getX() * block.w;
+      block.y = wall.getY() * block.h;
+      SDL_RenderFillRect(sdl_renderer, &block);
+  }
+
   // Render snake's body
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_SetRenderDrawColor(sdl_renderer, 89, 152, 47, 255);
   for (SDL_Point const &point : snake.body) {
     block.x = point.x * block.w;
     block.y = point.y * block.h;

@@ -6,6 +6,8 @@
 #include "controller.h"
 #include "renderer.h"
 #include "snake.h"
+#include "fruit.h"
+#include "wall.h"
 
 class Game {
  public:
@@ -17,7 +19,8 @@ class Game {
 
  private:
   Snake snake;
-  SDL_Point food;
+  Fruit fruit = Strawboring(0, 0);
+  std::vector<Wall> walls;
 
   std::random_device dev;
   std::mt19937 engine;
@@ -26,7 +29,9 @@ class Game {
 
   int score{0};
 
-  void PlaceFood();
+  void PlaceFruit();
+  void PlaceWall();
+  void UpdateWalls();
   void Update();
 };
 
