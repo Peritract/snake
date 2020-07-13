@@ -56,7 +56,6 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 }
 
 // Update walls
-
 void Game::UpdateWalls() {
   // Decay each wall
   for (auto wall : walls) {
@@ -139,6 +138,14 @@ void Game::Update() {
     // Increase speed
     if (fruit.getSpeeds()){
       snake.speed += 0.02;
+    }
+  }
+
+  // Check if the snake has hit a wall
+  for (auto wall : walls) {
+    if (wall.getX() == new_x && wall.getY() == new_y) {
+      snake.alive = false;
+      return;
     }
   }
 }
