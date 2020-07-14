@@ -35,6 +35,8 @@ When you run the program, the game plays. Try not to die.
 
 ## Rubric
 
+Essential:
+
 - [x] A README is included
 - [x] The README includes information about the project
 - [x] The README indicates which points on the rubric have been met
@@ -42,11 +44,13 @@ When you run the program, the game plays. Try not to die.
 
 ---
 
+8/5 required points:
+
 - [x] The submission uses a variety of control structures (functions, loops, ifs, and a switch statement are all found in `game.cpp`)
 - [x] The project code is organized into classes with class attributes to hold the data, and class methods to perform tasks. (The `fruit.h` file contains several classes, and there is one in `wall.h`)
 - [x] Classes encapsulate behavior. (`fruit.h`)
 - [x] Classes follow an appropriate inheritance hierarchy. (`fruit.h` contains a base class and several child classes)
-- [x] Overloaded constructors in `fruit.h` for the base `Fruit` class
+- [x] Overloaded functions allow the same function to operate on different parameters. (Overloaded constructors in `fruit.h` for the base `Fruit` class)
 - [x] Class constructors utilize member initialization lists. (`fruit.h`, `wall.h`)
 - [x] Classes use appropriate access specifiers for class members. (`fruit.h`, `wall.h`)
 - [x] The project uses Object Oriented Programming techniques. (`fruit.h`, `wall.h`)
