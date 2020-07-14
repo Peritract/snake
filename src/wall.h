@@ -16,9 +16,9 @@ class Wall {
         int getX()const {return _x;}
         int getY() const {return _y;}
         int getDuration() const {return _duration; }
-        
-        // Update method - reduce wall lifespan by one
-        void update(){
+
+        // Decrease duration
+        void Update() {
             _duration--;
         }
 

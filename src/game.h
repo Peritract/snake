@@ -33,6 +33,7 @@ class Game {
   void PlaceWall();
   void UpdateWalls();
   void Update();
+  bool CheckWallForRemoval(Wall const &wall);
 };
 
 #endif

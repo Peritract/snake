@@ -1,12 +1,11 @@
 #include "game.h"
 #include <iostream>
-#include "SDL.h"
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
       engine(dev()),
-      random_w(0, static_cast<int>(grid_width)),
-      random_h(0, static_cast<int>(grid_height)) {
+      random_w(0, static_cast<int>(grid_width - 1)),
+      random_h(0, static_cast<int>(grid_height - 1)) {
   PlaceFruit();
 }
 
@@ -40,6 +39,14 @@ void Game::Run(Controller const &controller, Renderer &renderer,
       // Update the walls
       UpdateWalls();
 
+      // Update the fruit, if necessary
+      if (fruit.getName() == "Clementime"){
+        fruit.Update();
+        if (fruit.getVal() <= 0){
+          PlaceFruit();
+        }
+      }
+
       // And the window title
       renderer.UpdateWindowTitle(score, frame_count);
       frame_count = 0;
@@ -55,18 +62,31 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   }
 }
 
+// Check a wall for removal
+bool Game::CheckWallForRemoval(Wall const &wall){
+  if (wall.getDuration() <= 0){
+    return true;
+  } else {
+    return false;
+  }
+};
+
 // Update walls
 void Game::UpdateWalls() {
+
   // Decay each wall
-  for (auto wall : walls) {
-    wall.update();
+  for (auto &wall : walls) {
+    wall.Update();
   }
 
-  // Remove any walls with 0 duration left
-  std::remove_if(walls.begin(), walls.end(), [](Wall w){ return w.getDuration(); });
+  // Remove all walls with a duration of 0 or less
+  walls.erase(
+    std::remove_if(walls.begin(), walls.end(),
+    [](const Wall & o) { return o.getDuration() <= 0; }),
+    walls.end());
 
   // If fewer than five walls remain, add a new one
-  if (walls.size() < 5) {
+  if (walls.size() < 10) {
     PlaceWall();
   }
 }
@@ -83,7 +103,6 @@ void Game::PlaceWall() {
       // Random duration (5-30 seconds)
       int duration = rand() % 30 + 5;
       walls.emplace_back(Wall(x, y, duration));
-      std::cout << "New wall" << std::endl;
       break;
     }
   }
@@ -95,15 +114,22 @@ void Game::PlaceFruit() {
   while (true) {
     x = random_w(engine);
     y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing
+    // Check that the location is not occupied by a snake or a wall before placing
     // fruit.
-    if (!snake.SnakeCell(x, y)) {
+    bool occupied = false;
+    for (auto wall : walls) {
+      if (wall.getX() == x && wall.getY() == y) {
+        occupied = true;
+      }
+    }
+    if (!snake.SnakeCell(x, y) || occupied) {
       break;
     }
+
   }
 
   // Select and create a fruit
-  switch(rand()%(3)){
+  switch(rand()%(4)){
     case 0:
       fruit = Strawboring(x, y);
       break;
@@ -113,8 +139,12 @@ void Game::PlaceFruit() {
     case 2:
       fruit = Aprinot(x, y);
       break;
+    case 3:
+      int duration = rand() % 14 + 7;
+      fruit = Clementime(x, y, duration);
+      break;
   }
-  std::cout << "New Fruit (" << x << ", " << y << ")" << std::endl;
+  std::cout << "New" << fruit.getName() << " (" << x << ", " << y << ")" << std::endl;
 }
 
 void Game::Update() {

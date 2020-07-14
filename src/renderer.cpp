@@ -64,7 +64,7 @@ void Renderer::Render(Snake const snake, Fruit const &fruit, std::vector<Wall> c
   }
 
   // Render snake's body
-  SDL_SetRenderDrawColor(sdl_renderer, 89, 152, 47, 255);
+  SDL_SetRenderDrawColor(sdl_renderer, 89, 102, 47, 255);
   for (SDL_Point const &point : snake.body) {
     block.x = point.x * block.w;
     block.y = point.y * block.h;
@@ -75,7 +75,7 @@ void Renderer::Render(Snake const snake, Fruit const &fruit, std::vector<Wall> c
   block.x = static_cast<int>(snake.head_x) * block.w;
   block.y = static_cast<int>(snake.head_y) * block.h;
   if (snake.alive) {
-    SDL_SetRenderDrawColor(sdl_renderer, 0x00, 0x7A, 0xCC, 0xFF);
+    SDL_SetRenderDrawColor(sdl_renderer, 89, 152, 47, 255);
   } else {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
   }
